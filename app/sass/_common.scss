@@ -1,0 +1,230 @@
+/*公用的样式**/
+$borderStyle:1px solid #e7e7e7;
+%fl{
+    float:left; 
+}
+%fr{
+    float:right;
+}
+%display_block{
+    display:block;
+}
+%display_lineBlock{
+    display:line-block;
+}
+%display_none{
+    display:none;
+}
+%text_centen{
+    text-align:center;
+}
+%page_width{
+    width:1200px;
+}
+%nav_width{
+    width:198px;
+}
+%container_width{
+    width:1000px;
+}
+%page_bg{
+    // background: #f9f6f5;
+    background-color: #fff;
+}
+
+%page_common{
+    font:12px "宋体";
+    margin:0 auto;      
+}
+%page_common_lineHeight{
+    line-height:35px;
+}
+%boxSizing{
+    box-sizing:border-box;
+}
+%clearFloat{
+    &:after{
+        clear:both;
+        content:"";
+        display:block;
+        height:0;
+        width:0;
+    }
+}
+%overflow_hidden{
+    overflow:hidden; 
+}   
+
+%content_Container{
+    @extend %fl;
+    @extend %container_width;
+    @extend %boxSizing;    
+}
+
+%labelCheckbox{
+    display: block;
+    position:absolute;
+    left:4px;bottom:4px;
+    width: 16px;
+    height: 16px;           
+    border:1px solid #bababa;
+    input[type='checkbox']{
+         visibility: hidden;
+     }
+}
+%labelChecked{
+    border-color:#60b166;
+    background:#fff url(../images/selected.png) no-repeat center center;
+    border-radius:3px;
+}
+
+%choiceBox_radio{
+     label.choiceBox{
+        @extend %labelCheckbox;
+        display: inline-block;
+        position:relative;
+        vertical-align: middle;
+        top:-2px;
+    }
+    label.selected{
+        @extend %labelChecked;
+    }
+
+}
+
+/******按钮控件*********/
+
+
+.show{
+    @extend %display_block;     
+}
+
+.hide{
+    @extend %display_none;      
+}
+/************************************************************共用样式**/
+@mixin baseStyle($width:100px,$lineHeight:50px,$fontSize:12px){
+    width:$width;
+    line-height: $lineHeight;
+    font-size: $fontSize;    
+}
+//广告的说明
+@mixin adExplain($paddTop:40px,$margin:0 20px,$marginLeft:14px) {
+    padding-top:$paddTop;   
+    margin: $margin; 
+    position:relative;
+    span{
+        margin-left:$marginLeft;
+    }
+}
+
+@mixin putInTheRegion($padingTop:38px,$minHeight:134px,$mingin:0 20px) {
+    padding-top:$padingTop;
+    margin: $mingin;  
+    min-height:$minHeight;  
+}
+@mixin putInTheRegion_region($h6Width:74px,$regionWidth:715px){
+    h6,.region{
+        @extend %fl;        
+        font-weight: 400;
+    }
+    h6{
+        width: $h6Width;
+    }
+    .region{
+        width: $regionWidth;
+    }
+}
+
+@mixin putInTheRegion_capital($width:660px) {
+     .capital{           
+        @extend %fl;
+        padding-bottom:10px;
+        strong{
+            display: inline-block;
+            vertical-align: top;        
+            font-weight: 500;
+        }
+        span{
+            display: inline-block;      
+            width: $width;
+        }
+    }
+}
+
+@mixin btnCtrl($marginR:10px,$bgColor:#48cfae,$color:#fff,$border:0 solid){
+    margin-right: $marginR;    
+    border:$border;
+    color:$color;
+    background-color:$bgColor;
+}
+
+/******/
+
+
+
+
+/*其他地方**/
+@function px2rem($px, $base-font-size: 72px) {
+    @if (unitless($px)) {
+        @warn "Assuming #{$px} to be in pixels, attempting to convert it into pixels for you";
+        @return px2em($px + 0px); // That may fail.
+    } @else if (unit($px) == rem) {
+        @return $px;
+    }
+    @return ($px / $base-font-size) * 1rem;
+}
+
+
+@mixin px2rem($property,$px-values,$baseline-px:16px,$support-for-ie:false){
+    //Conver the baseline into rems
+    $baseline-rem: $baseline-px / 1rem * 1;
+    //Print the first line in pixel values
+    @if $support-for-ie {
+        #{$property}: $px-values;
+    }
+    //if there is only one (numeric) value, return the property/value line for it.
+    @if type-of($px-values) == "number"{
+        #{$property}: $px-values / $baseline-rem;
+    }
+    @else {
+        //Create an empty list that we can dump values into
+        $rem-values:();
+        @each $value in $px-values{
+            // If the value is zero or not a number, return it
+            @if $value == 0 or type-of($value) != "number"{
+                $rem-values: append($rem-values, $value / $baseline-rem);
+            }
+        }
+        // Return the property and its list of converted values
+        #{$property}: $rem-values;
+    }
+}
+/*媒询时使用**/
+@mixin max-screen($num){
+    @media only screen and (max-width:$num){
+        @content;               
+    }
+}
+
+/**li标签右边的箭头***********/
+@mixin arrow_r{  
+    position:absolute;
+    top: 50%;/*17*/
+    right: 10px;/**此处的值  固定了?**/
+    transform: translateY(-50%);
+    content:"";  
+    display: inline-block;
+    width: px2rem(17px);
+    height: px2rem(28px);
+    background:#fff url(../img/arrow_r@2x.png) no-repeat;  
+    background-size:100% 100%;  
+}
+
+/****居中的代码***********/
+@mixin position_center{
+    position:absolute;
+    top: 50%;   
+    left:50%;   
+    transform: translate(-50%,-50%);
+}

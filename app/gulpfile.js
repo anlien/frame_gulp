@@ -55,10 +55,10 @@ var directory={
       concatName:"index.min.js" //多个文件合并成一个文件      
     },
     sass:{
-      src:"sass/*.scss",
+      src:["sass/*.scss"],
       dist:"./css"
     },
-    css{
+    css:{
       src:"css/*.css",
       dist:"../dist/css"
     },
@@ -84,8 +84,7 @@ var directory={
 /***************************************************server************/
 //web服务器
 gulp.task('webserver',function(){
-	gulp.src('.').
-	pipe(webserver({
+	gulp.src('.').pipe(webserver({
 		livereload:true,
 		directoryListing:true,	
 		port:8080,
@@ -176,8 +175,8 @@ gulp.task('compress-own-js',function(){ //将编写的js合并为一个文件
 
 /***************************************************sass||css************/
 //编译sass
-gulp.task(director.sass["src"],function(){
-	sass('sass/*.scss',{
+gulp.task('compress-sass',function(){   
+	sass("sass/*.scss",{
 		  precision: 6,
           stopOnError: true,
           cacheLocation: '.sass-cache',
@@ -185,7 +184,7 @@ gulp.task(director.sass["src"],function(){
           precision:2
 	  })
        .on('error', sass.logError)
-       .pipe(gulp.dest(director.sass["dist"]))
+       .pipe(gulp.dest("./css"))
     }
 ); 
 
@@ -265,10 +264,3 @@ gulp.task("pre",['webserver']);
 
 //默认
 gulp.task('default',['compress-indexHtml','compress-html','compress-sass','compress-js','compress-images']);
-  
-
-//维护与优化：
-  //背景图替换为 base64 或者 使用雪碧图
-  /* 
-  *
-  */

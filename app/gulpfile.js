@@ -27,27 +27,27 @@ var imagemin = require('gulp-imagemin'), //正常图片的压缩
 
 //合并文件
 var concat = require('gulp-concat');//操作文件时使用的一些工具
-var clean = require('gulp-clean');
 var rename = require('gulp-rename');
 
+//tmodjs
+var tmodjs = require("gulp-tmod");
 
 var jshint = require('gulp-jshint'),  //js的校验
     stylish = require('jshint-stylish');
 
-//gulp-tmod ——————————一种模板
-var tmodjs = require('gulp-tmod');
+const exec = require("child_process").exec;
 
 //目录
 //src:源文件
 //dist:生成文件存放的目录
 var directory={
     indexHtml:{ //默认目录下的index.html文件
-      src:"index.html",
+      src:"./*.html",
       dist:"../dist"
     },
     html:{
-      src:'docs/**/*.html',
-      dist:'../dist/docs'
+      src:'docs/page/**/*.html',
+      dist:'../dist/docs/page'
     },
     js:{
       src:"js/**/*.js",
@@ -56,14 +56,14 @@ var directory={
     },
     sass:{
       src:["sass/*.scss"],
-      dist:"./css"
+      dist:"css"
     },
     css:{
       src:"css/*.css",
       dist:"../dist/css"
     },
     images:{
-      src:'images/*.{png,jpg,gif}',//需要指明要压缩的文件；需要区分雪碧图，与正常的图片
+      src:'images/**/*.{png,jpg,gif}',//需要指明要压缩的文件；需要区分雪碧图，与正常的图片
       dist:"../dist/images"
     },
     sprites:{ //雪碧图(精灵图)。即将多个小图片合并成一张图片，并生成css。在css中有雪碧图的位置
@@ -76,10 +76,9 @@ var directory={
     },
     base64:{
       src:"./css/*.css",
-      dist:"./css/*.css"
+      dist:"../dist/css"
     }
 };
-
 
 /***************************************************server************/
 //web服务器
@@ -102,7 +101,6 @@ gulp.task("devWatch",function(){
 
 //监听任务
 gulp.task('watch', function () {
-
     watch('js/*.js', batch(function (events, done) {
         gulp.start('compress-js', done);
     }));
@@ -123,18 +121,19 @@ gulp.task('watch', function () {
        gulp.start('compress-images',done);
     }));
 });
+
 /***************************************************html************/
 //压缩html   
 gulp.task('compress-html', function() {  
   var opts = {comments:true,spare:true};
-  gulp.src([director.html["src"]])
+  gulp.src([directory.html["src"]])
     .pipe(minifyHtml(opts))
-    .pipe(gulp.dest(director.html.dist));
+    .pipe(gulp.dest(directory.html.dist));
 });
 
 //压缩首页代码    单个文件压缩
 gulp.task('compress-indexHtml', function() {
-  return gulp.src(director.indexHtml["src"])
+  return gulp.src(directory.indexHtml["src"])
     .pipe(usemin({    
       css: [ rev() ],
       css1: [ rev() ],
@@ -146,33 +145,26 @@ gulp.task('compress-indexHtml', function() {
       inlinejs: [ uglify() ],
       inlinejs1: [ uglify() ],
     }))
-    .pipe(gulp.dest(director.indexHtml["dist"]));
+    .pipe(gulp.dest(directory.indexHtml["dist"]));
 });
 /***************************************************js************/
 //压缩js
 gulp.task('compress-js',function(){
-  return gulp.src(director.js["src"]) 
+  return gulp.src(directory.js["src"]) 
   .pipe(jshint())  
   .pipe(jshint.reporter('jshint-stylish')) /*stylish：一种更改jshint打印*****/
-  .pipe(concat(director.js["concatName"])) //合并到一个文件，可注释这行
+  .pipe(concat(directory.js["concatName"])) //合并到一个文件，可注释这行
   .pipe(uglify())
-  .pipe(gulp.dest(director.js["dist"]))
-});
-
-//合并依赖包
-gulp.task('compress-libs-js',function(){ /*将依赖包合并为一个文件*************/
-  gulp.src('js/libs/*.min.js')
-  .pipe(concat('depend.js'))
-  .pipe(gulp.dest('../dist/js/libs'))
+  .pipe(gulp.dest(directory.js["dist"]))
 });
 
 //合并压缩后的文件
-gulp.task('compress-own-js',function(){ //将编写的js合并为一个文件
-  gulp.src(director.js["dist"]+'/*.js')
-  .pipe(concat(director.js["concatName"]))
-  .pipe(gulp.dest(director.js["dist"]))
+ //将编写的js合并为一个文件
+gulp.task('compress-own-js',function(){
+  gulp.src(directory.js["dist"]+'/*.js')
+  .pipe(concat(directory.js["concatName"]))
+  .pipe(gulp.dest(directory.js["dist"]))
 });
-
 /***************************************************sass||css************/
 //编译sass
 gulp.task('compress-sass',function(){   
@@ -184,83 +176,91 @@ gulp.task('compress-sass',function(){
           precision:2
 	  })
        .on('error', sass.logError)
-       .pipe(gulp.dest("./css"))
+       .pipe(gulp.dest(directory.sass["dist"]))
     }
 ); 
 
 //压缩css
 gulp.task('compress-css',function(){
-  return gulp.src(director.css["src"])
+  return gulp.src(directory.css["src"])
          .pipe(minifycss())
-         .pipe(gulp.dest(director.css["dist"]))
+         .pipe(gulp.dest(directory.css["dist"]))
 });
 
 /***************************************************images***********/
 //压缩图片   
 gulp.task('compress-images',function(){
-  return gulp.src(director.images["src"]) // 指明源文件路径、并进行文件匹配     
+  return gulp.src(directory.images["src"]) // 指明源文件路径、并进行文件匹配     
     .pipe(imagemin({use: [pagquant({quality:3,posterize:8})]}))///使用pngquant插件(imageMin的一个插件)进行深度压缩  // 无损压缩JPG图片
-    .pipe(gulp.dest(director.images["dist"]))
+    .pipe(gulp.dest(directory.images["dist"]))
 });
 
 //直接生成雪碧图
 gulp.task('compress-images-spritesmith',function(){
- var spriteData = gulp.src(director.sprites["src"]).pipe(spritesmith({
-    retinaSrcFilter: director.sprites.retinaSrcFilter, 
-    imgName: director.sprites.sprite,
-    retinaImgName: director.sprites.retinaImgName,
-    cssName: director.sprites.cssName
+ var spriteData = gulp.src(directory.sprites["src"]).pipe(spritesmith({
+    retinaSrcFilter: directory.sprites.retinaSrcFilter, 
+    imgName: directory.sprites.sprite,
+    retinaImgName: directory.sprites.retinaImgName,
+    cssName: directory.sprites.cssName
   }));
-  return spriteData.pipe(gulp.dest(director.sprites["dist"]));
+  return spriteData.pipe(gulp.dest(directory.sprites["dist"]));
 });
 
 //参考：https://github.com/Wenqer/gulp-base64___可挑选的工具
 gulp.task('compress-image-base64',function(){
-   return gulp.src(director.base64["src"])
-          .pipe(base64({maxImageSize: 8*1024}))
-          //.pipe(concat('main.css')) //可以合并多个css为一个文件
-          .pipe(gulp.dest(director.base64["dist"]))
+   return gulp.src(directory.base64["src"])
+          .pipe(base64({maxImageSize: 8*1024}))       
+          .pipe(gulp.dest(directory.base64["dist"]))
 });
 
-/***************************************************命令***********/
-//清除命令
-gulp.task('clean',function(){
-  return gulp.src('../dist/*.html',{read:false})
-         .pipe(clean());         
+
+/***编译命令**/
+gulp.task("cmdJsBuild",function(){
+  exec("cd tool && node r.js -o cmdConfig.js",(error,stdout,stderr) =>{
+    if(error){
+      console.log("cmd 编译出错");
+      return;
+    } 
+  });  
+})
+
+/***tmod模板编译*******************/
+gulp.task("buildTemplate",function(){
+    var stream = gulp.src("docs/template/**/*.html").
+                 pipe(tmodjs({
+                      "output": "../dist/docs/build",
+                      "charset": "utf-8",
+                      "syntax": "simple",
+                      "helpers": null,
+                      "escape": true,
+                      "compress": true,
+                      "type": "default",
+                      "runtime": "template.js",
+                      "combo": true,
+                      "minify": true,
+                      "cache": false,
+                      "templateBase":"./docs/template"
+                 })).
+                 pipe(uglify()).
+                 pipe(gulp.dest("./docs/build"));   
+    return stream;
 });
 
-//tmodjs 
-//使用腾讯的tmod模板，前台的一个模板。优势在前端js中使用模板，没有复杂的类库。
-//缺点：依赖一个tmod.js有一些冗余代码。
-//优势：前端使用模板，和后台的类似，没有过多的冗余js
-
-gulp.task('tmod',function(){   
-  var stream = gulp.src('docs/**/*.html')
-            .pipe(tmodjs({        
-              "charset": "utf-8",
-              "syntax": "simple",
-              "helpers": null,
-              "escape": true,
-              "compress": true,
-              "type": "amd",            
-              "combo": true,             
-              "cache": false
-            }))
-            .pipe(concat('tmod.min.js'))
-            .pipe(uglify())
-            .pipe(gulp.dest('../js'));
-  return stream;
+/*****合并cmd文件********************   tmod有时候编译不正确，没有合并代码***********/
+gulp.task("concatTempJs",function(){
+    gulp.src('../dist/docs/build/**/*.js')
+    .pipe(concat('template.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('../dist/docs/build'))
 });
 
 //生成雪碧图
 gulp.task('build',['compress-images-spritesmith']);
 
+
 //如果不更改sass，不必使用监听命令
 //开发命令——————————————更改sass文件时执行的命令
 gulp.task('dev',['webserver','devWatch']);
 
-//不更改sass，不必使用监听。 //web服务支持动态加载，更改即可看到效果。
-gulp.task("pre",['webserver']);
-
-//默认
-gulp.task('default',['compress-indexHtml','compress-html','compress-sass','compress-js','compress-images']);
+//上线编译————————生成网站文件
+gulp.task('default',['compress-indexHtml','compress-html','compress-sass','compress-images',"cmdJsBuild","buildTemplate",'compress-image-base64']);

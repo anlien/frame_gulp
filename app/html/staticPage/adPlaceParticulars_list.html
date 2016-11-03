@@ -175,5 +175,29 @@
 		</div>
 	</div>
 	<script src="../../js/libs/jquery-1.7.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		(function(){
+			$(function(){
+				$.ajax({
+					url: "http://121.40.218.24:7048/adv/common/preview/1?_=1478158405078",
+					type: 'GET',
+					dataType: 'json',
+					cache: false
+				})
+				.done(function(data) {
+					if(0 === data.status){
+						console.log(data)
+					}else{
+						console.log("error")
+					}
+				})
+				.fail(function(e) {					
+					if(0 !== e.status){
+						alert("数据时出现异常，请联系技术人员！");
+					}
+				})				
+			})
+		})()
+	</script>
 </body>
 </html>

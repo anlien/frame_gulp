@@ -46,8 +46,8 @@ var directory={
       dist:"../dist"
     },
     html:{
-      src:'docs/page/**/*.html',
-      dist:'../dist/docs/page'
+      src:'html/page/**/*.html',
+      dist:'../dist/page'
     },
     js:{
       src:"js/**/*.js",
@@ -105,7 +105,7 @@ gulp.task('watch', function () {
         gulp.start('compress-js', done);
     }));
 
-    watch(['docs/*.html'],batch(function(events,done){
+    watch(['html/*.html'],batch(function(events,done){
     	gulp.start('compress-html',done);
     }));
 
@@ -226,9 +226,9 @@ gulp.task("cmdJsBuild",function(){
 
 /***tmod模板编译*******************/
 gulp.task("buildTemplate",function(){
-    var stream = gulp.src("docs/template/**/*.html").
+    var stream = gulp.src("html/template/**/*.html").
                  pipe(tmodjs({
-                      "output": "../dist/docs/build",
+                      "output": "../dist/js/build",
                       "charset": "utf-8",
                       "syntax": "simple",
                       "helpers": null,
@@ -239,19 +239,19 @@ gulp.task("buildTemplate",function(){
                       "combo": true,
                       "minify": true,
                       "cache": false,
-                      "templateBase":"./docs/template"
+                      "templateBase":"./html/template"
                  })).
                  pipe(uglify()).
-                 pipe(gulp.dest("./docs/build"));   
+                 pipe(gulp.dest("../dist/js/build"));   
     return stream;
 });
 
 /*****合并cmd文件********************   tmod有时候编译不正确，没有合并代码***********/
 gulp.task("concatTempJs",function(){
-    gulp.src('../dist/docs/build/**/*.js')
+    gulp.src('../dist/page/build/**/*.js')
     .pipe(concat('template.min.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('../dist/docs/build'))
+    .pipe(gulp.dest('../dist/page/build'))
 });
 
 //生成雪碧图

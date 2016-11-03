@@ -61,10 +61,5 @@ src中的目录结构：
          tmodjs把待拼写html生成js模板，省去拼接的麻烦，使html抽象化并在不同的地方使用模板，使用的地点不限（原先是绑定到一个固定的js中，现在为共享）。可以将tmodjs生成的js文件理解为html代码片段。也可以将tmodjs生成的js合并到js中，使页面中模块话，这样可以拼装代码。
 
          
-
-
-
-    
-    
-
+[参考](http://www.w3cplus.com/preprocessor/sass-guidelin-part-4.html)
 

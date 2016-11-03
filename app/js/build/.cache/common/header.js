@@ -1,0 +1,2 @@
+/*TMODJS:{"version":1,"md5":"0ea3a21caf63be8ec12a744f768c7688"}*/
+template('common/header','<div class="header"> <img src="../../../images/logo.jpg" alt="logo"/> <div class="register"> <a href="/manager/index.html" style="float:left;color:#fff;line-height:20px;margin-top:20px;padding-right:20px;">系统配置</a> <a class="logUser" href="javascript:void(-1)"> <h5 id="loginUserName"></h5> </a> <a class="logOut" href="../../index.html"> <img src="../../../images/leave.jpg" alt="logOut"> </a> </div> </div>');

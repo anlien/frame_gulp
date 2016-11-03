@@ -1,0 +1,17 @@
+
+<div class="promptBox">
+	<h3>选择地区<span id="promptClose">×</span></h3>
+	<div class="promptBoxContent">
+		<div class="ctrlCheck"><label><input type="checkbox" name="select"></label><span>全国</span></div>
+		<ul class="areaProvince">
+			{{each result}}
+				<li id={{$value.provinceId}}><label><input type="checkbox" name="select"/></label><span>{{$value.name}}</span></li>	
+			{{/each}}	
+		</ul>
+		<ul class="areaCity">			
+		</ul>
+	</div>
+	<div class="promptBoxCtrl">
+		<input type="button" value="完成" />
+	</div>
+</div>

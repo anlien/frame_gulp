@@ -1,0 +1,10 @@
+{{each region}}		
+	<div class="capital">
+		<strong>{{$value.area}}
+		{{if !$value.regionIsFill}}/{{/if}}
+		</strong>
+		{{if !$value.regionIsFill}}
+			<span>{{$value.detail}}</span>	
+		{{/if}}
+	</div>				
+{{/each}}

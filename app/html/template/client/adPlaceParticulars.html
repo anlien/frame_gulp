@@ -1,0 +1,24 @@
+<div class="adPlacePartiContainer">	
+	{{ include './adPlaceParticulars_topMenu'}}
+	<ul class="subMenu">
+		<li class="viewCtrl"><a href="#" class="list_icon">列表视图</a></li>
+	</ul>
+	<div class="putInPlatform_ad">
+		<label class="platform_title">投放平台：</label>
+		<label class="radio checked"><input type="radio" name="platform"></label><span>全部</span>
+		<label class="radio"><input type="radio" name="platform"></label><span>IOS</span>
+		<label class="radio"><input type="radio" name="platform"></label><span>Android</span>
+	</div>		
+	<div class="putInTheRegion">
+		<h6>投放地区:</h6>				
+		<div class="region">	
+		</div>				
+		<div class="regionCtrl">				
+			<input type='button' class="selectRegion" value='选择地区'/>
+			<!-- <input type='button' class="filterRegion" value='筛选'/> -->
+		</div>	
+	</div>			
+	<!--载入模板数据-->	
+	<div id="viewContainer"></div>	
+	<a class="putInAD" href="javascript:void(-1)" style="display:none;">投放广告</a>
+</div>		

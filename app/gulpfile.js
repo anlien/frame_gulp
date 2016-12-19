@@ -5,7 +5,19 @@ var batch = require('gulp-batch');///服务的东西
 
 var uglify = require('gulp-uglify');//合并的东西
 var minifyHtml = require('gulp-minify-html');
+
+/**
+ * 
+ * <!-- build:js js/optimized.js -->
+   <script src="assets/js/foo.js"></script>
+   <script src="assets/js/bar.js"></script>
+   <!-- endbuild -->
+   html中的合并代码
+ * @type {[type]}
+ */
 var usemin = require('gulp-usemin');
+
+
 var rev = require('gulp-rev');
 
 var sass = require('gulp-ruby-sass');//sass与css
@@ -145,15 +157,10 @@ gulp.task('compress-html', function() {
 gulp.task('compress-indexHtml', function() {
   return gulp.src(directory.indexHtml["src"])
     .pipe(usemin({    
-      css: [ rev() ],
-      css1: [ rev() ],
+      css: [ rev() ], 
       html: [ minifyHtml({ empty: true }) ],
-      js: [ uglify(), rev() ],
-      js1: [ uglify(), rev() ],
-      js2: [ uglify(), rev() ],
-      js3: [ uglify(), rev() ],
+      js: [ uglify(), rev() ],   
       inlinejs: [ uglify() ],
-      inlinejs1: [ uglify() ],
     }))
     .pipe(gulp.dest(directory.indexHtml["dist"]));
 });
@@ -271,41 +278,6 @@ gulp.task("concatTempJs",function(){
     .pipe(concat('template.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('../dist/page/build'))
-});
-
-
-/*******************MD5 文件替换*****************************************/
-gulp.task("revreplace", function(){
-
-  var jsFilter = filter("../dist/**/*.js", { restore: true });
-  var cssFilter = filter("../dist/**/*.css", { restore: true });
-  var indexHtmlFilter = filter(['../dist/**/*', '!**/index.html'], { restore: true });
-
-  console.log(cssFilter)
-  /**
-   * 例子实验失败，需要再次尝试
-   */
-  return gulp.src("../dist/index.html")
-    .pipe(useref())      // Concatenate with gulp-useref
-    .pipe(jsFilter)
-    .pipe(jsFilter.restore)
-    .pipe(cssFilter)
-    .pipe(cssFilter.restore)
-    .pipe(indexHtmlFilter)
-    .pipe(rev())                // Rename the concatenated files (but not index.html)
-    .pipe(indexHtmlFilter.restore)
-    .pipe(rev.manifest())
-
-
-    .pipe(gulp.dest('../dist/public'));
-
-
-
-  // var manifest = gulp.src("../dist/rev-manifest.json");
-  // return gulp.src("../dist/index.html")
-  //   .pipe(revReplace({manifest: manifest}))
-  //   .pipe(gulp.dest('../dist'));
-
 });
 
 //生成雪碧图

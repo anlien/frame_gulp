@@ -37,6 +37,16 @@ var jshint = require('gulp-jshint'),  //js的校验
 
 const exec = require("child_process").exec;
 
+//css 自动加前缀
+var postcss = require('gulp-postcss');
+var autoprefixer = require('autoprefixer');
+
+//md5 后缀
+var useref = require('gulp-useref');
+var revReplace = require('gulp-rev-replace');
+var filter = require('gulp-filter');
+
+
 //目录
 //src:源文件
 //dist:生成文件存放的目录
@@ -207,12 +217,21 @@ gulp.task('compress-images-spritesmith',function(){
 });
 
 //参考：https://github.com/Wenqer/gulp-base64___可挑选的工具
-gulp.task('compress-image-base64',function(){
-   return gulp.src(directory.base64["src"])
-          .pipe(base64({maxImageSize: 8*1024}))       
+
+//给css加上前缀 ms wikit
+gulp.task('compress-image-base64',function(){  
+   return gulp.src(directory.base64["src"])         
+          .pipe(postcss([autoprefixer({browsers: ['> 0.001%']})]))   
+          .pipe(base64({maxImageSize: 8*1024}))                 
           .pipe(gulp.dest(directory.base64["dist"]))
 });
 
+//添加了自动添加css前缀的功能
+gulp.task('compress-autofixer',function(){
+    return gulp.src(directory.base64["src"])         
+          .pipe(postcss([autoprefixer({browsers: ['> 0.001%']})]))   
+          .pipe(gulp.dest(directory.base64["dist"]))
+})
 
 /***编译命令**/
 gulp.task("cmdJsBuild",function(){
@@ -252,6 +271,41 @@ gulp.task("concatTempJs",function(){
     .pipe(concat('template.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('../dist/page/build'))
+});
+
+
+/*******************MD5 文件替换*****************************************/
+gulp.task("revreplace", function(){
+
+  var jsFilter = filter("../dist/**/*.js", { restore: true });
+  var cssFilter = filter("../dist/**/*.css", { restore: true });
+  var indexHtmlFilter = filter(['../dist/**/*', '!**/index.html'], { restore: true });
+
+  console.log(cssFilter)
+  /**
+   * 例子实验失败，需要再次尝试
+   */
+  return gulp.src("../dist/index.html")
+    .pipe(useref())      // Concatenate with gulp-useref
+    .pipe(jsFilter)
+    .pipe(jsFilter.restore)
+    .pipe(cssFilter)
+    .pipe(cssFilter.restore)
+    .pipe(indexHtmlFilter)
+    .pipe(rev())                // Rename the concatenated files (but not index.html)
+    .pipe(indexHtmlFilter.restore)
+    .pipe(rev.manifest())
+
+
+    .pipe(gulp.dest('../dist/public'));
+
+
+
+  // var manifest = gulp.src("../dist/rev-manifest.json");
+  // return gulp.src("../dist/index.html")
+  //   .pipe(revReplace({manifest: manifest}))
+  //   .pipe(gulp.dest('../dist'));
+
 });
 
 //生成雪碧图

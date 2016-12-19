@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>redux的示例</title>
+</head>
+<body>
+	 <div>
+      <p>
+        Clicked: <span id="value">0</span> times
+        <button id="anleAdd">anleAdd</button>
+        <button id="anleSub">anleSub</button>
+        <button id="incrementAdd">incrementAdd</button>
+        <button id="incrementSub">incrementSub</button>
+      </p>
+
+    </div>
+	<script src="../../js/libs/jquery-1.7.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://unpkg.com/redux@latest/dist/redux.min.js"></script>
+	<script>
+		$(function(){
+
+			//
+			//
+			var initState = {
+				anle: 0,
+			 	increment:0
+			}
+
+
+			/**
+			 * 处理anle state的一部分
+			 */
+			function anle(state=0,action){
+				switch(action.type){
+					case 'anle_add':
+						return ++state
+					case 'anle_sub':
+						return --state 
+					default:
+						return state
+				}
+			}
+
+			function increment(state=0,action){
+				switch(action.type){
+					case 'increment_add':
+						return ++state
+					case 'increment_sub':
+						return --state
+					default :
+						return state
+				}
+			}
+
+			/**
+			 * 处理reduce	 		 
+			 */
+			// function counter(state = initState,action){		
+			// 	return Redux.combineReducers({
+			// 		anle,
+			// 		increment
+			// 	})
+				
+			// }
+
+			var store = Redux.createStore(Redux.combineReducers({anle,increment}));					
+			
+			store.subscribe(function(){
+				console.log(store.getState());
+			})
+			$("#anleAdd").on("click",function(){
+				store.dispatch({ type:"anle_add" })
+			})
+
+			$("#anleSub").on("click",function(){
+				store.dispatch({ type:"anle_sub" })
+			})
+
+			$("#incrementAdd").on("click",function(){
+				store.dispatch({ type:"increment_add" })
+			})
+
+			$("#incrementSub").on("click",function(){
+				store.dispatch({ type:"increment_sub" })
+			})
+		})
+	</script>
+</body>
+</html>
